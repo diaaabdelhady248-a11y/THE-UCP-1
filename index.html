@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE UCP</title>
+    <style>
+        :root {
+            --bg: #edf2f7;
+            --panel: #f8fafc;
+            --text: #14213d;
+            --muted: #5b6b7f;
+            --accent: #2f5f8c;
+            --accent-2: #4d7aa7;
+            --border: rgba(20, 33, 61, 0.16);
+            --shadow: 0 16px 40px rgba(15, 23, 34, 0.12);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f7f9fc 0%, #e9eef4 100%);
+            color: var(--text);
+            display: grid;
+            place-items: center;
+            padding: 24px;
+        }
+
+        .app-shell {
+            width: min(100%, 760px);
+            position: relative;
+        }
+
+        .container {
+            position: relative;
+            overflow: hidden;
+            background: var(--panel);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            border: 1px solid rgba(47, 95, 140, 0.12);
+            pointer-events: none;
+            animation: pulseFrame 5s ease-in-out infinite;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .brand-badge {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            box-shadow: 0 8px 18px rgba(47, 95, 140, 0.18);
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #14213d;
+        }
+
+        .brand p {
+            margin: 4px 0 0;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .intro {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .mode-switch {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 18px 0 16px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            border: 1px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 999px;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            color: var(--text);
+            background: #eef3f8;
+            transition: all 0.2s ease;
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba(20, 33, 61, 0.08);
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 10px 20px rgba(47, 95, 140, 0.16);
+        }
+
+        .panel {
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .panel.active { display: block; }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--muted);
+            font-weight: 700;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: #ffffff;
+            color: var(--text);
+            font-size: 1rem;
+            resize: vertical;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(47, 95, 140, 0.12);
+        }
+
+        .action-btn {
+            margin-top: 14px;
+            width: 100%;
+            border: none;
+            padding: 13px 16px;
+            border-radius: 999px;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            box-shadow: 0 10px 20px rgba(47, 95, 140, 0.16);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 24px rgba(47, 95, 140, 0.2);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .status { color: #325d85; font-weight: 700; }
+
+        .result-box {
+            margin-top: 14px;
+            min-height: 92px;
+            padding: 14px;
+            border-radius: 14px;
+            background: #f3f6fa;
+            border: 1px solid var(--border);
+            color: #23415f;
+            font-size: 1.05rem;
+            font-weight: 700;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulseFrame {
+            0%, 100% { opacity: 0.9; }
+            50% { opacity: 0.55; }
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 20px; }
+            .brand h1 { font-size: 1.4rem; }
+            .mode-switch { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-shell">
+    <div class="container">
+        <div class="brand">
+            <div class="brand-badge">UCP</div>
+            <div>
+                <h1>THE UCP</h1>
+                <p>ULTRASONIC COMMUNICATION PROTOCOL</p>
+            </div>
+        </div>
+
+       
+
+        <div class="mode-switch">
+            <button class="mode-btn active" id="sendModeBtn" onclick="showPanel('send')">Send Message</button>
+            <button class="mode-btn" id="receiveModeBtn" onclick="showPanel('receive')">Receive Message</button>
+        </div>
+
+        <div class="panel active" id="sendPanel">
+            <label for="textInput">Type your message</label>
+            <textarea id="textInput" placeholder="Enter text to transmit..."></textarea>
+            <button class="action-btn" id="sendBtn" onclick="transmitText()">Send</button>
+        </div>
+
+        <div class="panel" id="receivePanel">
+            <div class="status-row">
+                <span>Listening mode</span>
+                <span class="status" id="statusText">Microphone is off</span>
+            </div>
+            <button class="action-btn" id="listenBtn" onclick="startListening()">Start Listening</button>
+            <div class="result-box" id="receivedText"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SUPPORTED_CHARS = " abcdefghijklmnopqrstuvwxyz";
+
+    const BASE_FREQ = 18500;
+    const STEP_FREQ = 50;
+
+    function showPanel(mode) {
+        document.getElementById('sendPanel').classList.toggle('active', mode === 'send');
+        document.getElementById('receivePanel').classList.toggle('active', mode === 'receive');
+        document.getElementById('sendModeBtn').classList.toggle('active', mode === 'send');
+        document.getElementById('receiveModeBtn').classList.toggle('active', mode === 'receive');
+    }
+
+    function getFrequencyForChar(char) {
+        let index = SUPPORTED_CHARS.indexOf(char.toLowerCase());
+        if (index === -1) return null;
+        return BASE_FREQ + (index * STEP_FREQ);
+    }
+
+    function getCharFromFrequency(freq) {
+        let index = Math.round((freq - BASE_FREQ) / STEP_FREQ);
+        if (index >= 0 && index < SUPPORTED_CHARS.length) {
+            return SUPPORTED_CHARS[index];
+        }
+        return '';
+    }
+
+    async function transmitText() {
+        const text = document.getElementById('textInput').value;
+        if (!text) return;
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const duration = 0.4;
+        const pause = 0.15;
+
+        document.getElementById('sendBtn').disabled = true;
+
+        for (let i = 0; i < text.length; i++) {
+            let char = text[i];
+            let freq = getFrequencyForChar(char);
+
+            if (freq !== null) {
+                let osc = audioCtx.createOscillator();
+                let gainNode = audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.value = freq;
+
+                gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.05);
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime + duration - 0.05);
+                gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration);
+
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            }
+            await new Promise(resolve => setTimeout(resolve, (duration + pause) * 1000));
+        }
+
+        document.getElementById('sendBtn').disabled = false;
+    }
+
+    let isListening = false;
+    let audioContext, analyser, stream;
+    let lastChar = '';
+    let charSilenceCount = 0;
+    let lastSignalTime = 0;
+    let lineBreakInserted = false;
+
+    function appendReceivedText(text) {
+        document.getElementById('receivedText').innerText += text;
+        document.getElementById('receivedText').scrollTop = document.getElementById('receivedText').scrollHeight;
+    }
+
+    async function startListening() {
+        if (isListening) return;
+
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    echoCancellation: false,
+                    noiseSuppression: false,
+                    autoGainControl: false
+                },
+                video: false
+            });
+
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 2048;
+
+            let source = audioContext.createMediaStreamSource(stream);
+            source.connect(analyser);
+
+            isListening = true;
+            document.getElementById('statusText').innerText = "Listening now...";
+            document.getElementById('receivedText').innerText = "";
+            document.getElementById('listenBtn').disabled = true;
+
+            processAudio();
+        } catch (err) {
+            alert("Please allow microphone access.");
+            console.error(err);
+        }
+    }
+
+    function processAudio() {
+        if (!isListening) return;
+
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        analyser.getByteFrequencyData(dataArray);
+
+        let maxVal = 0;
+        let maxIndex = -1;
+
+        let minBin = Math.floor((18000 * bufferLength) / (audioContext.sampleRate / 2));
+        let maxBin = Math.ceil((21000 * bufferLength) / (audioContext.sampleRate / 2));
+
+        for (let i = minBin; i <= maxBin; i++) {
+            if (dataArray[i] > maxVal) {
+                maxVal = dataArray[i];
+                maxIndex = i;
+            }
+        }
+
+        let nyquist = audioContext.sampleRate / 2;
+        let frequency = maxIndex * nyquist / bufferLength;
+        const now = performance.now();
+
+        if (maxVal > 40 && frequency >= 18400 && frequency <= 20100) {
+            let detectedChar = getCharFromFrequency(frequency);
+
+            if (detectedChar && detectedChar !== lastChar) {
+                if (lastSignalTime && now - lastSignalTime >= 8000 && !lineBreakInserted) {
+                    appendReceivedText('\n=');
+                    lineBreakInserted = true;
+                }
+
+                if (detectedChar === ' ') {
+                    appendReceivedText('\u00A0');
+                } else {
+                    appendReceivedText(detectedChar);
+                }
+                lastChar = detectedChar;
+                lastSignalTime = now;
+                charSilenceCount = 0;
+                lineBreakInserted = false;
+            }
+        } else {
+            charSilenceCount++;
+            if (charSilenceCount > 2) {
+                lastChar = '';
+            }
+
+            if (lastSignalTime && now - lastSignalTime >= 8000 && !lineBreakInserted) {
+                appendReceivedText('\n=');
+                lineBreakInserted = true;
+            }
+        }
+
+        requestAnimationFrame(processAudio);
+    }
+</script>
+
+</body>
+</html>
